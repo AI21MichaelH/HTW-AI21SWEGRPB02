@@ -28,6 +28,6 @@ jobs:
         
     - name: Push Container
       run: |
-        docker pull ghcr.io/techchrobe/htwai21swegrpb02:latest
+        docker run ghcr.io/techchrobe/htwai21swegrpb02:latest
         docker push ghcr.io/techchrobe/htwai21swegrpb02:latest
       
