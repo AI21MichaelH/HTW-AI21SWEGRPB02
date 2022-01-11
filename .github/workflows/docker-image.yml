@@ -25,6 +25,6 @@ jobs:
     - name: Build the Docker image
       run: |
         docker build . --file Dockerfile --tag htwai21swegrpb02:$(date +%s)
-        docker run ghcr.io/techChrobe/htwai21swegrpb02:$(date +%s)
-        docker push ghcr.io/techChrobe/htwai21swegrpb02:$(date +%s)
+        docker run ghcr.io/techchrobe/htwai21swegrpb02:$(date +%s)
+        docker push ghcr.io/techchrobe/htwai21swegrpb02:$(date +%s)
       
