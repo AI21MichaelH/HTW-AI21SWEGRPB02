@@ -17,7 +17,6 @@ def get_random_string(length):
 @app.route("/file/<path:base64string>", methods=['POST'])
 def upload(base64string):
     filename = get_random_string(50)
-    print('generated filename', filename)
     with open(DIRECTORY_LOCATION + filename, "wb") as fh:
         fh.write(base64.b64decode(base64string))
     print('wrote file to', DIRECTORY_LOCATION + filename)
@@ -26,4 +25,4 @@ def upload(base64string):
 @app.route("/file/<fileCode>", methods=['GET'])
 def download(fileCode):
     print('try to download file', fileCode)
-    return send_from_directory(directory='DIRECTORY_LOCATION', filename=fileCode)
+    return send_from_directory(directory=DIRECTORY_LOCATION, filename=fileCode)

@@ -10,5 +10,6 @@ Have a docker environment file `.env`. Windows example:
 
 `-d` means to run in background
 `--build` forces a build
+`--force-recreate` forces the docker image to rebuild
 
 API available under `http://localhost:5000/` 
