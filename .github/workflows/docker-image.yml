@@ -23,8 +23,11 @@ jobs:
         password: ${{ secrets.GITHUB_TOKEN }}
         
     - name: Build the Docker image
-      run: |
+      run: 
         docker build . --file Dockerfile --tag htwai21swegrpb02:latest
+    
+    - name: Push Container
+      run: |
         docker run ghcr.io/techChrobe/htwai21swegrpb02:latest
         docker push ghcr.io/techChrobe/htwai21swegrpb02:latest
       
