@@ -26,9 +26,6 @@ jobs:
       run: 
         docker build . --file Dockerfile --tag htwai21swegrpb02:latest
     
-    - name: Log into GitHub Container Registry
-      run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login https://ghcr.io -u ${{ github.actor }} --password-stdin
-    
     - name: Push Container
       run: |
         docker run ghcr.io/techchrobe/htwai21swegrpb02:latest
