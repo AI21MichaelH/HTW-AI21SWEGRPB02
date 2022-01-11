@@ -7,7 +7,7 @@ on:
     branches: [ main ]
   
 env:
-  IMAGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: api
   IMAGE_TAG: latest
   
 jobs:
@@ -31,4 +31,4 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+        tags: ghcr.io/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
