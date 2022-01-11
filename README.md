@@ -6,8 +6,9 @@ Have a docker environment file `.env`. Windows example:
     HOST_VOLUME_PATH=//c/my/path/to/the/volume/data
 
 
-`docker-compose up -d`
+`docker-compose up -d --build`
 
 `-d` means to run in background
+`--build` forces a build
 
-API available undder `http://localhost:5000/` 
+API available under `http://localhost:5000/` 
