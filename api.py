@@ -29,4 +29,4 @@ def upload(base64string):
 @app.route("/file/<fileCode>", methods=['GET'])
 def download(fileCode):
     print('try to download file', fileCode)
-    return send_from_directory(directory=DIRECTORY_LOCATION, filename=fileCode)
+    return send_from_directory(DIRECTORY_LOCATION, fileCode)
