@@ -26,9 +26,9 @@ jobs:
         
     - name: Build the Docker image
       run: 
-        docker build . --file Dockerfile --tag techchrobe/api:latest
+        docker build . --file Dockerfile --tag htwai21swegrpb02
         
     - name: Push Container
       run: 
-        docker push ghcr.io/techchrobe/api:latest
+        docker push ghcr.io/techchrobe/htwai21swegrpb02:latest
       
