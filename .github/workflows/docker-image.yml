@@ -24,7 +24,7 @@ jobs:
         
     - name: Build the Docker image
       run: 
-        docker build . --file Dockerfile --tag ghcr.io/techchrobe/api:latest
+        docker build . --file Dockerfile --tag techchrobe/api:latest
         
     - name: Push Container
       run: 
