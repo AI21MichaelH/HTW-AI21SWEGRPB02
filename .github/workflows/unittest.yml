@@ -1,8 +1,7 @@
 # This workflow will install Python dependencies, run tests and lint with a single version of Python
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Python application
-
+name: Unit Test
 on:
   push:
     branches: [ main ]
@@ -25,6 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install flask
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Test with pytest
+    - name: Unittest
       run: |
-        python -m unittest discover tests
+        cd Test
+        python -m unittest discover tests -s .
