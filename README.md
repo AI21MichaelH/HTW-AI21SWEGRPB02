@@ -1,5 +1,10 @@
 # HTW-AI21SWEGRPB02
 
+## Members:
+- Maximilian Deutsch (ai21m024)
+- Michael Hermann-Hubler (ai21m010)
+- Christina Obereigner (ai21m006)
+
 # Running the server
 Have a docker environment file `.env`. Windows example:
 
@@ -19,7 +24,9 @@ API available under `http://localhost:5000/`
 ## Uploading
 
 To upload a file, the Base64 String of the file has to be supplied in the call.
+
 The endpoint is /file with request method POST
+
 An example call is `http://localhost:5000/file/VGVzdA==`
 
 The answer will supply an unique token that can be used to access the file. This token is created randomly and cannot be recreated by uploading the same file again.
@@ -27,7 +34,9 @@ The answer will supply an unique token that can be used to access the file. This
 ## Downloading
 
 To download a file you have to supply the unique token in the call.
-The endpoint is /file iwth request method GET
+
+The endpoint is /file with request method GET
+
 An example call is `http://localhost:5000/file/pbjjgoojjnkaahstajumojutzyakdcbtaiopwrlknlryqjtcna`
 
 The file will returned and downloaded
