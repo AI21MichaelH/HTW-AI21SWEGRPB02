@@ -1,4 +1,7 @@
 # HTW-AI21SWEGRPB02
++ Christina Obereigner
++ Maximilian Deutsch
++ Michael Hermann-Hubler
 
 # Running the server
 Have a docker environment file `.env`. Windows example:
