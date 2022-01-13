@@ -1,4 +1,7 @@
 # HTW-AI21SWEGRPB02
++ Christina Obereigner
++ Maximilian Deutsch
++ Michael Hermann-Hubler
 
 ## Members:
 - Maximilian Deutsch (ai21m024)
