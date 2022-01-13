@@ -3,11 +3,6 @@
 + Maximilian Deutsch
 + Michael Hermann-Hubler
 
-## Members:
-- Maximilian Deutsch (ai21m024)
-- Michael Hermann-Hubler (ai21m010)
-- Christina Obereigner (ai21m006)
-
 # Running the server
 Have a docker environment file `.env`. Windows example:
 
