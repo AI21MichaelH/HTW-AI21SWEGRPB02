@@ -1,7 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Page Title</title>
+<title>MAI SWE 2</title>
+<meta charset="utf-8"/>
 </head>
 <body>
     <script>
@@ -24,40 +25,46 @@
 <video id="video" width="640" height="480" autoplay></video>
 <button id="snap">Snap Photo</button>
 <canvas id="canvas" width="640" height="480"></canvas>
+
 <form>
     <label for="fname">Name:</label><br>
     <input type="text" id="fname" name="fname"><br>
-    <input type="submit" value="Upload">
 </form> 
 
-  
+<button id="submit">Upload</button>
+
 <button id="show">Show Video</button>
 
 <script>
     // Elements for taking the snapshot
     var canvas = document.getElementById('canvas');
         var context = canvas.getContext('2d');
-        var video = document.getElementById('video');
         var input = document.getElementById("fname").value;
+        var video = document.getElementById('video');
+        var dataURL
 
         // Trigger photo take
         document.getElementById("snap").addEventListener("click", function() {
             context.drawImage(video, 0, 0, 640, 480);
+
+            dataURL = canvas.toDataURL();
+            console.log(dataURL);
         });
 
         //Trigger on submit
         document.getElementById("submit").addEventListener("click", function(){
-            const requestUrl = "file/" + input;
-            
-            fetch(requestUrl)
-            .then(response => response.json())
-            .then(data => { 
-            // do something with the data the API has returned
-            })
+            input = document.getElementById("fname").value;
+            const url = "file/" + input + "/" + dataURL;
+            console.log(url);
+
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", url);
+            xhr.send();
         })
 
         //Trigger on submit
         document.getElementById("show").addEventListener("click", function(){
+            input = document.getElementById("fname").value;
             const requestUrl = "file/" + input;
             
             fetch(requestUrl)
