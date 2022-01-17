@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Page Title</title>
+</head>
+<body>
+    <script>
+        // Grab elements, create settings, etc.
+        var video = document.getElementById('video');
+
+        // Get access to the camera!
+        if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            // Not adding `{ audio: true }` since we only want video now
+            navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
+                //video.src = window.URL.createObjectURL(stream);
+                video.srcObject = stream;
+                video.play();
+            });
+        }
+    </script>
+
+<h1>Snap a Photo and upload it with your name to generate a Video</h1>
+
+<video id="video" width="640" height="480" autoplay></video>
+<button id="snap">Snap Photo</button>
+<canvas id="canvas" width="640" height="480"></canvas>
+<form>
+    <label for="fname">Name:</label><br>
+    <input type="text" id="fname" name="fname"><br>
+    <input type="submit" value="Upload">
+</form> 
+
+  
+<button id="show">Show Video</button>
+
+<script>
+    // Elements for taking the snapshot
+    var canvas = document.getElementById('canvas');
+        var context = canvas.getContext('2d');
+        var video = document.getElementById('video');
+        var input = document.getElementById("fname").value;
+
+        // Trigger photo take
+        document.getElementById("snap").addEventListener("click", function() {
+            context.drawImage(video, 0, 0, 640, 480);
+        });
+
+        //Trigger on submit
+        document.getElementById("submit").addEventListener("click", function(){
+            const requestUrl = "file/" + input;
+            
+            fetch(requestUrl)
+            .then(response => response.json())
+            .then(data => { 
+            // do something with the data the API has returned
+            })
+        })
+
+        //Trigger on submit
+        document.getElementById("show").addEventListener("click", function(){
+            const requestUrl = "file/" + input;
+            
+            fetch(requestUrl)
+            .then(response => response.json())
+            .then(data => { 
+            // do something with the data the API has returned
+            })
+        })
+</script>
+
+</body>
+</html> 
