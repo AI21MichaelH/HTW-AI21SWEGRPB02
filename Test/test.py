@@ -18,6 +18,7 @@ class TestData:
     gifToken = 'pbjjgoojjnkaahstajumojutzyakdcbtaiopwrlknlryqjtcna'
     mp3Token = 'ylhzdajwnueqmkzdtpqbccjkczsnisdvkirbmdpfxqfxtzjmcf'
     excelToken = 'wssntykvewrcgsuekkcweigzhpzhruwmumyvtymyodaddvpdwi'
+    videoName = 'video-name'
 
     def textBase64(): return 'VGVzdA=='
     def textContent(): return 'Test'
@@ -67,22 +68,22 @@ class Test(unittest.TestCase):
 
     # Test Upload
     def helper(self, base64String):
-        token = upload('video-name', base64String)
+        token = upload(TestData.videoName, base64String)
 
-        with open(os.path.join('./data', token), 'rb') as f:
+        with open(os.path.join('./data', TestData.videoName, token), 'rb') as f:
             content = f.read()
         
-        os.remove(os.path.join('./data', token))
+        os.remove(os.path.join('./data', TestData.videoName, token))
 
         return content
 
     def test_Text_Upload(self):
-        token = upload('video-name', TestData.textBase64())
+        token = upload(TestData.videoName, TestData.textBase64())
 
-        with open(os.path.join('./data', token), 'r') as f:
+        with open(os.path.join('./data', TestData.videoName, token), 'r') as f:
             content = f.read()
         
-        os.remove(os.path.join('./data', token))
+        os.remove(os.path.join('./data', TestData.videoName, token))
 
         self.assertEqual(content, TestData.textContent())
 
