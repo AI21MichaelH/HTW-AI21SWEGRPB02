@@ -18,7 +18,6 @@ class TestData:
     gifToken = 'pbjjgoojjnkaahstajumojutzyakdcbtaiopwrlknlryqjtcna'
     mp3Token = 'ylhzdajwnueqmkzdtpqbccjkczsnisdvkirbmdpfxqfxtzjmcf'
     excelToken = 'wssntykvewrcgsuekkcweigzhpzhruwmumyvtymyodaddvpdwi'
-    videoName = 'video-name'
 
     def textBase64(): return 'VGVzdA=='
     def textContent(): return 'Test'
@@ -67,40 +66,41 @@ class Test(unittest.TestCase):
                 os.remove(os.path.join('../data', f))
 
     # Test Upload
-    def helper(self, base64String):
-        token = upload(TestData.videoName, base64String)
+    def helper(self, videoName, base64String):
+        upload(videoName, base64String)
 
-        with open(os.path.join('./data', TestData.videoName, token), 'rb') as f:
+        with open(os.path.join('./data', videoName, 'IMG1.jpg'), 'rb') as f:
             content = f.read()
         
-        os.remove(os.path.join('./data', TestData.videoName, token))
+        os.remove(os.path.join('./data', videoName, 'IMG1.jpg'))
 
         return content
 
     def test_Text_Upload(self):
-        token = upload(TestData.videoName, TestData.textBase64())
+        videoName = 'text-video'
+        upload(videoName, TestData.textBase64())
 
-        with open(os.path.join('./data', TestData.videoName, token), 'r') as f:
+        with open(os.path.join('./data', videoName, 'IMG1.jpg'), 'r') as f:
             content = f.read()
         
-        os.remove(os.path.join('./data', TestData.videoName, token))
+        os.remove(os.path.join('./data', videoName, 'IMG1.jpg'))
 
         self.assertEqual(content, TestData.textContent())
 
     def test_PDF_Upload(self):
-        content = self.helper(TestData.pdfBase64())
+        content = self.helper('pdf-video', TestData.pdfBase64())
         self.assertEqual(content, TestData.pdfContent())
 
     def test_GIF_Upload(self):
-        content = self.helper(TestData.gifBase64())
+        content = self.helper('gif-video', TestData.gifBase64())
         self.assertEqual(content, TestData.gifContent())
 
     def test_MP3_Upload(self):
-        content = self.helper(TestData.mp3Base64())
+        content = self.helper('mp3-video', TestData.mp3Base64())
         self.assertEqual(content, TestData.mp3Content())
         
     def test_Excel_Upload(self):
-        content = self.helper(TestData.excelBase64())
+        content = self.helper('excel-video', TestData.excelBase64())
         self.assertEqual(content, TestData.excelContent())
 
     #Test Download
