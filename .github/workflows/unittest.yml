@@ -16,12 +16,15 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v2
 
-      - name: Start RabbitMQ
-        uses: namoshek/rabbitmq-github-action@v1
-        with:
-          version: '3.8.9'
-          ports: '1883:1883 8883:8883' # TODO other ports?
-          container-name: 'ai21-ws21-swe-rabbitmq'
+      - name: start rabbit mq
+        run: docker run --detach --name ai21-ws21-swe-rabbitmq rabbitmq:3
+
+      # - name: Start RabbitMQ
+      #   uses: namoshek/rabbitmq-github-action@v1
+      #   with:
+      #     version: '3.8.9'
+      #     ports: '1883:1883 8883:8883' # TODO other ports?
+      #     container-name: 'ai21-ws21-swe-rabbitmq'
           # TODO create custom docker image for rabbit mq? 
           # TODO use env variables or something else to reduce redunantly declaring things like container-name etc
      # - run: test
