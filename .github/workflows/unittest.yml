@@ -35,6 +35,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: edit docker dns options
+      run: echo 'DOCKER_OPTS="--dns 8.8.8.8 --dns 10.252.252.252"' >> /etc/defaul/docker
     - name: start rabbit mq
       run: sudo docker run --detach --name ai21-ws21-swe-rabbitmq --publish 5672:5672 --publish 15672:15672 rabbitmq:3
     - name: Set up Python 3.10
