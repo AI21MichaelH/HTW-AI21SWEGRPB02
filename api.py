@@ -54,7 +54,7 @@ def download(fileCode):
 
             # 'amqp://rabbit_mq?connection_attempts=10&retry_delay=10'
 
-rabbitMqUrl = 'amqp://ai21-ws21-swe-rabbitmq?connection_attempts=10&retry_delay=10'
+rabbitMqUrl = 'amqp://ai21-ws21-swe-rabbitmq?connection_attempts=5&retry_delay=4'
 
 
 # Producer
