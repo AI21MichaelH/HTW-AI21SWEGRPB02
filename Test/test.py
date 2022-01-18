@@ -67,7 +67,7 @@ class Test(unittest.TestCase):
 
     # Test Upload
     def helper(self, base64String):
-        token = upload(base64String)
+        token = upload('video-name', base64String)
 
         with open(os.path.join('./data', token), 'rb') as f:
             content = f.read()
