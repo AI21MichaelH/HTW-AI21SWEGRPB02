@@ -77,7 +77,7 @@ class Test(unittest.TestCase):
         return content
 
     def test_Text_Upload(self):
-        token = upload(TestData.textBase64())
+        token = upload('video-name', TestData.textBase64())
 
         with open(os.path.join('./data', token), 'r') as f:
             content = f.read()
