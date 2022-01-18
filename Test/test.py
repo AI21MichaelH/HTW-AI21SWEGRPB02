@@ -1,5 +1,10 @@
 import sys
 sys.path.append('../.')
+
+# config can be used by other python files
+import config
+config.TEST_MODE = True
+
 from api import *
 
 import unittest
