@@ -1,15 +1,17 @@
-import random
-import string
+import atexit
 import base64
+import io
 import os
+import random
+import shutil
+import string
+import magic
+import pika
 
 from flask import Flask
-from flask.helpers import send_from_directory
-
-import pika
-import atexit
+from flask.helpers import send_file, send_from_directory
 from threading import Thread
-from flask import jsonify
+
 import config
 
 app = Flask(__name__)
@@ -26,15 +28,31 @@ def upload(name, base64string):
     if not os.path.isdir(DIRECTORY_LOCATION):
         os.mkdir(DIRECTORY_LOCATION)
 
+    tempdir = DIRECTORY_LOCATION + 'temp/'
+    if not os.path.isdir(tempdir):
+        os.mkdir(tempdir)
+
     path = DIRECTORY_LOCATION + name + '/'
     if not os.path.isdir(path):
         os.mkdir(path)
 
-    onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-    filenname = 'IMG'
-    ending = '.jpg'
+    with open(tempdir + 'tmp', "wb") as fh:
+        fh.write(base64.b64decode(base64string))
+        mimeType = magic.from_file(tempdir + 'tmp', mime=True)
+        if mimeType.startswith('image'):
+            filenname = 'IMG'
+            ending = '.jpg'
+        elif mimeType.startswith('video'):
+            filenname = 'VID'
+            ending = '.mp4'
+        else:            
+            filenname = name
+            ending = ''
+            path = DIRECTORY_LOCATION
+    os.remove(tempdir + 'tmp')
     
     if ending == '.jpg':
+        onlyfiles = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
         i = 1
         while (filenname + str(i) + ending) in onlyfiles:
             i = i + 1
@@ -43,17 +61,31 @@ def upload(name, base64string):
             fh.write(base64.b64decode(base64string))
         print('wrote file to', path + filenname + str(i) + ending)
     else:
-        with open(name + ending, "wb") as fh:
+        with open(path + filenname + ending, "wb") as fh:
             fh.write(base64.b64decode(base64string))
 
     return 'Success'
 
-@app.route("/file/<fileCode>", methods=['GET'])
-def download(fileCode):
-    print('try to download file', fileCode)
-    return send_from_directory(DIRECTORY_LOCATION, fileCode)
+@app.route("/file/<name>", methods=['GET'])
+def download(name):
+    path = DIRECTORY_LOCATION + name + '/'
 
+    if os.path.isdir(path):
+        tempdir = DIRECTORY_LOCATION + 'temp/'
+        if not os.path.isdir(tempdir):
+            os.mkdir(tempdir)
 
+        return_data = io.BytesIO()
+        shutil.make_archive(tempdir + 'tmp.zip', 'zip', path)
+        with open(tempdir + 'tmp.zip', 'rb') as fo:
+            return_data.write(fo.read())
+        os.remove(tempdir + 'tmp.zip')
+
+        return_data.seek(0)
+
+        return send_file(return_data)
+    else:
+        return send_from_directory(DIRECTORY_LOCATION, name)
 
 if not config.TEST_MODE:
     rabbitMqUrl ='amqp://ai21-ws21-swe-rabbitmq?connection_attempts=5&retry_delay=4'
