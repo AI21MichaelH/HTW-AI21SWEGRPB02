@@ -44,7 +44,7 @@ def upload(name, base64string):
             ending = '.jpg'
         elif mimeType.startswith('video'):
             filenname = 'VID'
-            ending = '.mp4'
+            ending = '.avi'
         else:            
             filenname = name
             ending = ''
@@ -76,14 +76,14 @@ def download(name):
             os.mkdir(tempdir)
 
         return_data = io.BytesIO()
-        shutil.make_archive(tempdir + 'tmp.zip', 'zip', path)
+        shutil.make_archive(tempdir + 'tmp', 'zip', path)
         with open(tempdir + 'tmp.zip', 'rb') as fo:
             return_data.write(fo.read())
         os.remove(tempdir + 'tmp.zip')
 
         return_data.seek(0)
 
-        return send_file(return_data)
+        return send_file(return_data, mimetype='application/zip')
     else:
         return send_from_directory(DIRECTORY_LOCATION, name)
 
