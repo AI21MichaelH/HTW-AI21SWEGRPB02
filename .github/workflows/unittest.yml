@@ -36,7 +36,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: start rabbit mq
-      run: docker run --detach --name ai21-ws21-swe-rabbitmq --publish 5672:5672 --publish 15672:15672 rabbitmq:3
+      run: sudo docker run --detach --name ai21-ws21-swe-rabbitmq --publish 5672:5672 --publish 15672:15672 rabbitmq:3
     - name: Set up Python 3.10
       uses: actions/setup-python@v2
       with:
