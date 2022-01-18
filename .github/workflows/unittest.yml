@@ -24,7 +24,7 @@ jobs:
           container-name: 'ai21-ws21-swe-rabbitmq'
           # TODO create custom docker image for rabbit mq? 
           # TODO use env variables or something else to reduce redunantly declaring things like container-name etc
-      - run: test
+     # - run: test
 
   build:
     needs: rabbitmq-start
