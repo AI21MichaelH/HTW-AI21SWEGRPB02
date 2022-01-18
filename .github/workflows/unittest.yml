@@ -17,7 +17,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: start rabbit mq
-        run: docker run --detach --name ai21-ws21-swe-rabbitmq rabbitmq:3
+        run: docker run --detach --name ai21-ws21-swe-rabbitmq --publish 5672:5672 --publish 15672:15672 rabbitmq:3
 
       # - name: Start RabbitMQ
       #   uses: namoshek/rabbitmq-github-action@v1
