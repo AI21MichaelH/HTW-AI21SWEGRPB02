@@ -19,7 +19,7 @@ tempdir = 'temp/'
 def onCall(ch, method, properties, body):
     videoName = body.split('|')[1]
     url = downloadUrl.format(name = videoName)
-    videoPath = tempdir + videoName + '/' + videoName + '.avi'
+    videoPath = tempdir + videoName + '/' + videoName + '.mp4'
 
     response = requests.get(url)
     if not os.path.isdir(tempdir):
@@ -33,7 +33,8 @@ def onCall(ch, method, properties, body):
     frame = cv2.imread(os.path.join(tempdir + videoName, images[0]))
     height, width, _ = frame.shape
 
-    video = cv2.VideoWriter(videoPath, 0, 1, (width,height))
+    fourcc = 0x00000021 # Codec needed for Web Viewing
+    video = cv2.VideoWriter(videoPath, fourcc, 1, (width,height))    
     for image in images:
         video.write(cv2.imread(os.path.join(tempdir + videoName, image)))
 

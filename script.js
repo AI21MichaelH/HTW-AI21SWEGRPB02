@@ -61,7 +61,7 @@ function showVideo(){
         var video2 = document.getElementById('video');
         var source = document.createElement('source');
 
-        source.setAttribute('src', baseURL + input);
+        source.setAttribute('src', baseURL + 'video/' + input);
         source.setAttribute('type', 'video/mp4');
 
         video2.appendChild(source);
