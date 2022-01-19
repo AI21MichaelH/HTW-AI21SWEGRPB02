@@ -38,41 +38,45 @@
 <script>
     // Elements for taking the snapshot
     var canvas = document.getElementById('canvas');
-        var context = canvas.getContext('2d');
-        var input = document.getElementById("fname").value;
-        var video = document.getElementById('video');
-        var dataURL
+    var context = canvas.getContext('2d');
+    var input = document.getElementById("fname").value;
+    var video = document.getElementById('video');
+    var baseURL = "http://localhost:5000/file/";
+    var dataURL;
 
-        // Trigger photo take
-        document.getElementById("snap").addEventListener("click", function() {
-            context.drawImage(video, 0, 0, 640, 480);
+    // Trigger photo take
+    document.getElementById("snap").addEventListener("click", function() {
+        context.drawImage(video, 0, 0, 640, 480);
 
-            dataURL = canvas.toDataURL();
-            console.log(dataURL);
+        dataURL = canvas.toDataURL('image/jpeg');
+        console.log(dataURL);
+    });
+
+    //Trigger on submit
+    document.getElementById("submit").addEventListener("click", function(){
+        input = document.getElementById("fname").value;
+        const url = baseURL + input + "/" + dataURL;
+        console.log(url);
+
+        fetch(url, {method: 'POST'})
+            .then(response => response.json())
+            .then(data => { 
+                console.log(data);
+            });
         });
 
-        //Trigger on submit
-        document.getElementById("submit").addEventListener("click", function(){
+    //Trigger on submit
+    document.getElementById("show").addEventListener("click", function(){
             input = document.getElementById("fname").value;
-            const url = "file/" + input + "/" + dataURL;
-            console.log(url);
-
-            var xhr = new XMLHttpRequest();
-            xhr.open("POST", url);
-            xhr.send();
-        })
-
-        //Trigger on submit
-        document.getElementById("show").addEventListener("click", function(){
-            input = document.getElementById("fname").value;
-            const requestUrl = "file/" + input;
+            const requestUrl = baseURL + input;
             
             fetch(requestUrl)
             .then(response => response.json())
             .then(data => { 
+                console.log("fetched video");
             // do something with the data the API has returned
-            })
-        })
+        });
+    });
 </script>
 
 </body>
