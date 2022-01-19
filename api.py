@@ -39,7 +39,7 @@ def upload(name, base64string):
     with open(tempdir + 'tmp', "wb") as fh:
         fh.write(base64.b64decode(base64string))
         mimeType = magic.from_file(tempdir + 'tmp', mime=True)
-        if mimeType.startswith('image'):
+        if mimeType.startswith('image') or base64string.startswith('data:image/jpeg;base64'):
             filenname = 'IMG'
             ending = '.jpg'
         elif mimeType.startswith('video'):
