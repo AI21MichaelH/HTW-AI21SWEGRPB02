@@ -34,17 +34,13 @@ function snap() {
 //Trigger on submit
 function submit(){
     input = document.getElementById("fname").value;
-    window.sessionStorage.setItem('input', input);
-    var idk = window.sessionStorage.getItem('input');
-    console.log(idk);
-    const requestUrl = baseURL + input;
-            
-    fetch(requestUrl)
-        .then(response => response.json())
-        .then(data => { 
-            console.log("request");
-            console.log(data);
-        // do something with the data the API has returned
+
+    const url = baseURL + input + "/" + dataURL;
+        console.log(url);
+        fetch(url, {method: 'POST'})
+            .then(response => response.json())
+            .then(data => { 
+                console.log(data);
     });
 }
 
