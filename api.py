@@ -57,6 +57,7 @@ def upload(name, base64string):
         while (filenname + str(i) + ending) in onlyfiles:
             i = i + 1
         
+        base64string = base64string.replace('data:image/jpeg;base64,', '')
         with open(path + filenname + str(i) + ending, "wb") as fh:
             fh.write(base64.b64decode(base64string))
         print('wrote file to', path + filenname + str(i) + ending)
