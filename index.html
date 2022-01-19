@@ -50,6 +50,10 @@
 
         dataURL = canvas.toDataURL('image/jpeg');
         console.log(dataURL);
+        dataURL = dataURL.substring(dataURL.indexOf("/") + 1);
+        dataURL = dataURL.substring(dataURL.indexOf("/") + 1);
+        dataURL = dataURL.substring(dataURL.indexOf("/") + 1);
+        console.log(dataURL);
     });
 
     //Trigger on submit
@@ -73,7 +77,7 @@
             fetch(requestUrl)
             .then(response => response.json())
             .then(data => { 
-                console.log("fetched video");
+                console.log(data);
             // do something with the data the API has returned
         });
     });
