@@ -9,7 +9,7 @@ Have a docker environment file `.env`. Windows example:
     HOST_VOLUME_PATH=//c/my/path/to/the/volume/data
 
 
-`docker-compose up -d --build`
+`docker-compose up --build`
 
 `-d` means to run in background  
 `--build` forces a build  
