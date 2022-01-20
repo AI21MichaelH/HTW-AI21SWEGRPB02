@@ -20,10 +20,12 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
+        sudo apt-get update
+        sudo apt-get --yes install libmagic1
         python -m pip install --upgrade pip
         pip install flask
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: Unittest
       run: |
-        cd Test
+        cd file-repository/Test
         python -m unittest discover tests -s .

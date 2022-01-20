@@ -1,6 +1,7 @@
 import atexit
 import base64
 import io
+import re
 import os
 import random
 import shutil
@@ -8,14 +9,21 @@ import string
 import magic
 import pika
 
-from flask import Flask
+from flask import Flask, Response
 from flask.helpers import send_file, send_from_directory
 from threading import Thread
 
 import config
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 DIRECTORY_LOCATION = 'data/'
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Accept-Ranges', 'bytes')
+    return response
 
 def get_random_string(length):
     # choose from all lowercase letter
@@ -23,6 +31,22 @@ def get_random_string(length):
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
     
+def read_file_chunks(path, byte1=None, byte2=None):
+    file_size = os.stat(path).st_size
+    start = 0
+    
+    if byte1 < file_size:
+        start = byte1
+    if byte2:
+        length = byte2 + 1 - byte1
+    else:
+        length = file_size - start
+
+    with open(path, 'rb') as f:
+        f.seek(start)
+        chunk = f.read(length)
+    return chunk, start, length, file_size
+
 @app.route("/file/<name>/<path:base64string>", methods=['POST'])
 def upload(name, base64string):
     if not os.path.isdir(DIRECTORY_LOCATION):
@@ -44,7 +68,7 @@ def upload(name, base64string):
             ending = '.jpg'
         elif mimeType.startswith('video'):
             filenname = 'VID'
-            ending = '.avi'
+            ending = '.mp4'
         else:            
             filenname = name
             ending = ''
@@ -87,6 +111,14 @@ def download(name):
         return send_file(return_data, mimetype='application/zip')
     else:
         return send_from_directory(DIRECTORY_LOCATION, name)
+
+@app.route("/file/video/<name>", methods=['GET'])
+def downloadVideo(name):
+    path = DIRECTORY_LOCATION + name + '/VID.mp4'
+
+    resp = Response(open(path, 'rb'), direct_passthrough=True, mimetype='video/mp4', content_type='video/mp4')
+    resp.headers['Content-Disposition'] = 'inline'
+    return resp
 
 if not config.TEST_MODE:
     rabbitMqUrl ='amqp://ai21-ws21-swe-rabbitmq?connection_attempts=5&retry_delay=4'
@@ -143,3 +175,6 @@ if not config.TEST_MODE:
 
     atexit.register(close_rabbitmq_connection)
     # TODO shutdown signals: https://docs.python.org/2/library/signal.html
+
+if __name__ == "__main__":
+    app.run(threaded=True)
