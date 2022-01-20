@@ -29,8 +29,11 @@ const server = http.createServer((req, res) => {
                 res.setHeader('Content-Type', 'text/html');
                 fs.createReadStream(filePath).pipe(res);
             });
-        }
-        else if (fileExt == '.css') {
+        } else if(fileExt == '.js'){
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'text/html');
+            fs.createReadStream(filePath).pipe(res);
+        } else if (fileExt == '.css') {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'text/css');
             fs.createReadStream(filePath).pipe(res);
