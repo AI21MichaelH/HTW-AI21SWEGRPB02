@@ -1,8 +1,11 @@
 FROM node:lts-alpine
 
 RUN npm install -g http-server
+RUN npm install -g amqplib
+
 
 WORKDIR /app
+# RUN npm install --save amqplib
 
 COPY package*.json ./
 
