@@ -19,6 +19,21 @@ function load(){
             video.play();
         });
     }
+
+    // testing call to frontend server
+    var frontendServerURL = 'http://localhost:3000';
+    const url = frontendServerURL + '/messages';
+    fetch(url, {
+            method: 'POST',
+            body: 'Testing a message!',
+            headers: {
+                'Content-Type': 'text/plain'
+            }
+        })
+        .then(response => {})
+        .catch(err => {
+            console.log('ERROR:', err);
+        });
 }
 
 // Trigger photo take
