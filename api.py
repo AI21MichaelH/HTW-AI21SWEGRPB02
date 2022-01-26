@@ -13,6 +13,8 @@ from flask import Flask, Response
 from flask.helpers import send_file, send_from_directory
 from threading import Thread
 
+from requests.api import request
+
 import config
 
 app = Flask(__name__)
@@ -47,8 +49,12 @@ def read_file_chunks(path, byte1=None, byte2=None):
         chunk = f.read(length)
     return chunk, start, length, file_size
 
-@app.route("/file/<name>/<path:base64string>", methods=['POST'])
-def upload(name, base64string):
+@app.route("/file/<name>", methods=['POST'])
+def upload(name):
+    base64string = request.data
+    if len(base64string) == 0:
+        base64string = request.form
+
     if not os.path.isdir(DIRECTORY_LOCATION):
         os.mkdir(DIRECTORY_LOCATION)
 

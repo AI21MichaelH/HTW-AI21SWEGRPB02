@@ -17,43 +17,44 @@ uploadUrl = fileRepoUrl + '/file/{name}/{base64String}'
 tempdir = 'temp/'
 
 def onCall(ch, method, properties, body):
-    videoName = body.split('|')[1]
-    url = downloadUrl.format(name = videoName)
-    videoPath = tempdir + videoName + '/' + videoName + '.mp4'
+    if body.split('|')[0].lower() == 'video request':
+        videoName = body.split('|')[1]
+        url = downloadUrl.format(name = videoName)
+        videoPath = tempdir + videoName + '/' + videoName + '.mp4'
 
-    response = requests.get(url)
-    if not os.path.isdir(tempdir):
-        os.mkdir(tempdir)
-    
-    open(tempdir + videoName + '.zip', 'wb').write(response.content)
-    shutil.unpack_archive(tempdir + videoName + '.zip', tempdir + videoName)
-    os.remove(tempdir + videoName + '.zip')
+        response = requests.get(url)
+        if not os.path.isdir(tempdir):
+            os.mkdir(tempdir)
+        
+        open(tempdir + videoName + '.zip', 'wb').write(response.content)
+        shutil.unpack_archive(tempdir + videoName + '.zip', tempdir + videoName)
+        os.remove(tempdir + videoName + '.zip')
 
-    images = [img for img in os.listdir(tempdir + videoName) if img.endswith(".jpg")]
-    frame = cv2.imread(os.path.join(tempdir + videoName, images[0]))
-    height, width, _ = frame.shape
+        images = [img for img in os.listdir(tempdir + videoName) if img.endswith(".jpg")]
+        frame = cv2.imread(os.path.join(tempdir + videoName, images[0]))
+        height, width, _ = frame.shape
 
-    fourcc = 0x00000021 # Codec needed for Web Viewing
-    video = cv2.VideoWriter(videoPath, fourcc, 1, (width,height))    
-    for image in images:
-        video.write(cv2.imread(os.path.join(tempdir + videoName, image)))
+        fourcc = 0x00000021 # Codec needed for Web Viewing
+        video = cv2.VideoWriter(videoPath, fourcc, 1, (width,height))    
+        for image in images:
+            video.write(cv2.imread(os.path.join(tempdir + videoName, image)))
 
-    cv2.destroyAllWindows()
-    video.release()
+        cv2.destroyAllWindows()
+        video.release()
 
-    with open(videoPath, "rb") as image_file:
-        encoded_string = base64.b64encode(image_file.read())
-        encoded_string = encoded_string.decode('ascii')
-    shutil.rmtree(tempdir + videoName)
+        with open(videoPath, "rb") as image_file:
+            encoded_string = base64.b64encode(image_file.read())
+            encoded_string = encoded_string.decode('ascii')
+        shutil.rmtree(tempdir + videoName)
 
-    url = uploadUrl.format(name = videoName, base64String = encoded_string)
-    response = requests.post(url)
+        url = uploadUrl.format(name = videoName, base64String = encoded_string)
+        response = requests.post(url)
 
-    if not config.TEST_MODE:
-        channelProducer.basic_publish(exchange='',
-                        routing_key='hello',
-                        body='New Video available|{name}'.format(name='videoName'))
-        print("published a new video")    
+        if not config.TEST_MODE:
+            channelProducer.basic_publish(exchange='',
+                            routing_key='hello',
+                            body='New Video available|{name}'.format(name='videoName'))
+            print("published a new video")    
 
 if config.TEST_MODE:
     onCall('', '', '', 'Video request|test')
