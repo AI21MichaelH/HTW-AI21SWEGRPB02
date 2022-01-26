@@ -50,12 +50,18 @@ function snap() {
 function submit(){
     input = document.getElementById("fname").value;
 
-    const url = baseURL + input + "/" + dataURL;
-        console.log(url);
-        fetch(url, {method: 'POST'})
-            .then(response => response.json())
-            .then(data => { 
-                console.log(data);
+    const url = baseURL + input;
+    console.log(url);
+    fetch(url, {
+            method: 'POST',
+            body: dataURL,
+            headers: {
+                'Content-Type': 'text/plain'
+            }
+        })
+        .then(response => response.json())
+         .then(data => { 
+            console.log(data);
     });
 }
 
