@@ -9,11 +9,10 @@ import string
 import magic
 import pika
 
-from flask import Flask, Response
+from flask import Flask, Response, request
 from flask.helpers import send_file, send_from_directory
 from threading import Thread
 
-from requests.api import request
 
 import config
 
@@ -51,7 +50,7 @@ def read_file_chunks(path, byte1=None, byte2=None):
 
 @app.route("/file/<name>", methods=['POST'])
 def upload(name):
-    base64string = request.data
+    base64string = request.get_data().decode("utf-8") 
     if len(base64string) == 0:
         base64string = request.form
 
@@ -69,6 +68,7 @@ def upload(name):
     with open(tempdir + 'tmp', "wb") as fh:
         fh.write(base64.b64decode(base64string))
         mimeType = magic.from_file(tempdir + 'tmp', mime=True)
+
         if mimeType.startswith('image') or base64string.startswith('data:image/jpeg;base64'):
             filenname = 'IMG'
             ending = '.jpg'
