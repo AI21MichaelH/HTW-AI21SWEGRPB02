@@ -12,7 +12,7 @@ services:
   htwai21swegrpb02:
     image: htwai21swegrpb02
     build:
-      context: .
+      context: ./file-repository
       dockerfile: ./Dockerfile
     ports:
       - 5000:5000
@@ -22,4 +22,21 @@ services:
       - ai21-ws21-swe-rabbitmq # can't really rely on depends_on
     restart: on-failure # try restarting if connection to rabbitmq failed. But connection retrys should be handled in the image itself
   
-  
+  ai21-ws21-swe-frontend:
+    image: ai21-ws21-swe-frontend
+    build:
+      context: ./frontend
+      dockerfile: ./Dockerfile
+    ports:
+      - 3000:3000
+    depends_on:
+      - ai21-ws21-swe-rabbitmq # can't really rely on depends_on
+
+  ai21-ws21-swe-video-builder:
+    image: ai21-ws21-swe-video-builder
+    build:
+      context: ./video-builder
+      dockerfile: ./Dockerfile
+    depends_on:
+      - ai21-ws21-swe-rabbitmq # can't really rely on depends_on
+    restart: on-failure # try restarting if connection to rabbitmq failed. But connection retrys should be handled in the image itself
