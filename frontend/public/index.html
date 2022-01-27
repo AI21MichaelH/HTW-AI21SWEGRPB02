@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>MAI SWE 2</title>
+    <meta charset="utf-8"/>
+    <script src="script.js"></script>
+</head>
+<body onload="load()">
+    <h1>Snap a Photo and upload it with your name to generate a Video</h1>
+
+    <video id="video" width="640" height="480" autoplay></video>
+    <button id="snap" onclick="snap()">Snap Photo</button>
+    <canvas id="canvas" width="640" height="480"></canvas>
+    <br>
+    <form>
+        <label for="fname">Name:</label><br>
+        <input type="text" id="fname" name="fname"><br>
+    </form> <br>
+
+    <button id="submit" onclick="submit()">Upload</button>
+
+    <button id="show" onclick="saveName(); location.href='video.html'">Show Video</button>
+</body>
+</html>

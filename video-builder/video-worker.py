@@ -25,6 +25,7 @@ def onCall(ch, method, properties, body):
     except:
         body = body
 
+
     if body.split('|')[0].lower() == 'video request':        
         videoName = body.split('|')[1]
         print('is video request with videoName: ', videoName)

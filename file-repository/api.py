@@ -1,6 +1,7 @@
 import atexit
 import base64
 import io
+import re
 import os
 import random
 import shutil
@@ -8,14 +9,21 @@ import string
 import magic
 import pika
 
-from flask import Flask
+from flask import Flask, Response, request
 from flask.helpers import send_file, send_from_directory
 from threading import Thread
 
 import config
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
 DIRECTORY_LOCATION = 'data/'
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Accept-Ranges', 'bytes')
+    return response
 
 def get_random_string(length):
     # choose from all lowercase letter
@@ -23,7 +31,30 @@ def get_random_string(length):
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
     
-@app.route("/file/<name>/<path:base64string>", methods=['POST'])
+def read_file_chunks(path, byte1=None, byte2=None):
+    file_size = os.stat(path).st_size
+    start = 0
+    
+    if byte1 < file_size:
+        start = byte1
+    if byte2:
+        length = byte2 + 1 - byte1
+    else:
+        length = file_size - start
+
+    with open(path, 'rb') as f:
+        f.seek(start)
+        chunk = f.read(length)
+    return chunk, start, length, file_size
+
+
+
+@app.route("/file/<name>", methods=['POST'])
+def upload(name):
+    base64string = request.get_data().decode("utf-8") 
+
+    return upload(name, base64string)
+
 def upload(name, base64string):
     if not os.path.isdir(DIRECTORY_LOCATION):
         os.mkdir(DIRECTORY_LOCATION)
@@ -39,12 +70,13 @@ def upload(name, base64string):
     with open(tempdir + 'tmp', "wb") as fh:
         fh.write(base64.b64decode(base64string))
         mimeType = magic.from_file(tempdir + 'tmp', mime=True)
-        if mimeType.startswith('image'):
+
+        if mimeType.startswith('image') or base64string.startswith('data:image/jpeg;base64'):
             filenname = 'IMG'
             ending = '.jpg'
         elif mimeType.startswith('video'):
             filenname = 'VID'
-            ending = '.avi'
+            ending = '.mp4'
         else:            
             filenname = name
             ending = ''
@@ -57,6 +89,7 @@ def upload(name, base64string):
         while (filenname + str(i) + ending) in onlyfiles:
             i = i + 1
         
+        base64string = base64string.replace('data:image/jpeg;base64,', '')
         with open(path + filenname + str(i) + ending, "wb") as fh:
             fh.write(base64.b64decode(base64string))
         print('wrote file to', path + filenname + str(i) + ending)
@@ -68,24 +101,61 @@ def upload(name, base64string):
 
 @app.route("/file/<name>", methods=['GET'])
 def download(name):
+    print('api: download images')
     path = DIRECTORY_LOCATION + name + '/'
-
+    print('download:', path)
     if os.path.isdir(path):
+        print('download: is directory')
         tempdir = DIRECTORY_LOCATION + 'temp/'
         if not os.path.isdir(tempdir):
             os.mkdir(tempdir)
-
+        
         return_data = io.BytesIO()
         shutil.make_archive(tempdir + 'tmp', 'zip', path)
+        print('download: made archive')
         with open(tempdir + 'tmp.zip', 'rb') as fo:
             return_data.write(fo.read())
+
         os.remove(tempdir + 'tmp.zip')
-
+        print('download: removed tmp.zip')
         return_data.seek(0)
-
+        print('download: after seek(0)')
         return send_file(return_data, mimetype='application/zip')
     else:
         return send_from_directory(DIRECTORY_LOCATION, name)
+
+@app.route("/file/video/<name>", methods=['GET'])
+def downloadVideo(name):
+    path = DIRECTORY_LOCATION + name + '/VID.mp4'
+
+    resp = Response(open(path, 'rb'), direct_passthrough=True, mimetype='video/mp4', content_type='video/mp4')
+    resp.headers['Content-Disposition'] = 'inline'
+    return resp
+
+allowedOriginList = ['http://localhost:3000']
+
+@app.after_request
+def add_cors_headers(response):
+    print('add_cors_headers')
+    print('request.referrer:', request.referrer)
+    if request.referrer == None:
+        # access from video-worker
+        return response
+    r = request.referrer[:-1]
+    # r = request.headers['Origin'] is alternative
+    print('add_cors_headers r: ', r)
+    if r in allowedOriginList:
+        print('add_cors_headers r in allowed origin list')
+        response.headers.add('Access-Control-Allow-Origin', r)
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Headers', 'Cache-Control')
+        response.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+        response.headers.add('Access-Control-Allow-Headers', 'Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+    else:
+        print('add_cors_headders r NOT in allowed origin list')
+    return response
 
 if not config.TEST_MODE:
     rabbitMqUrl ='amqp://ai21-ws21-swe-rabbitmq?connection_attempts=5&retry_delay=4'
@@ -142,3 +212,6 @@ if not config.TEST_MODE:
 
     atexit.register(close_rabbitmq_connection)
     # TODO shutdown signals: https://docs.python.org/2/library/signal.html
+
+if __name__ == "__main__":
+    app.run(threaded=True)
