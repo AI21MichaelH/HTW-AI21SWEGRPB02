@@ -6,6 +6,8 @@ var video;
 var baseURL = "http://localhost:5000/file/";
 var dataURL;
 
+var frontendServerURL = 'http://localhost:3000';
+
 function load(){
     // Grab elements, create settings, etc.
     video = document.getElementById('video');
@@ -20,20 +22,20 @@ function load(){
         });
     }
 
-    // testing call to frontend server
-    var frontendServerURL = 'http://localhost:3000';
-    const url = frontendServerURL + '/messages';
-    fetch(url, {
-            method: 'POST',
-            body: 'Testing a message!',
-            headers: {
-                'Content-Type': 'text/plain'
-            }
-        })
-        .then(response => {})
-        .catch(err => {
-            console.log('ERROR:', err);
-        });
+    // // testing call to frontend server
+    // var frontendServerURL = 'http://localhost:3000';
+    // const url = frontendServerURL + '/messages';
+    // fetch(url, {
+    //         method: 'POST',
+    //         body: 'Testing a message!',
+    //         headers: {
+    //             'Content-Type': 'text/plain'
+    //         }
+    //     })
+    //     .then(response => {})
+    //     .catch(err => {
+    //         console.log('ERROR:', err);
+    //     });
 }
 
 // Trigger photo take
@@ -53,16 +55,33 @@ function submit(){
     const url = baseURL + input;
     console.log(url);
     fetch(url, {
+        method: 'POST',
+        body: dataURL,
+        headers: {
+            'Content-Type': 'text/plain'
+        }
+    })
+    .then(response => {
+        console.log('submit response: ', response)
+        triggerVideoBuild(input)
+    })
+    .catch(error => console.log('submit error response: ', error));
+}
+
+function triggerVideoBuild(videoName) {
+    const url = frontendServerURL + '/messages';
+    var message = 'video request|' + videoName
+    fetch(url, {
             method: 'POST',
-            body: dataURL,
+            body: message,
             headers: {
                 'Content-Type': 'text/plain'
             }
         })
-        .then(response => response.json())
-         .then(data => { 
-            console.log(data);
-    });
+        .then(() => {})
+        .catch(err => {
+            console.log('ERROR:', err);
+        });
 }
 
 function saveName(){

@@ -78,6 +78,7 @@ const server = http.createServer((req, res) => {
         } else if(fileExt == '.js'){
             res.statusCode = 200;
             res.setHeader('Content-Type', 'text/html');
+            // res.setHeader('Access-Control-Allow-Origin', 'http://localhost:5000')
             fs.createReadStream(filePath).pipe(res);
         } else if (fileExt == '.css') {
             res.statusCode = 200;
