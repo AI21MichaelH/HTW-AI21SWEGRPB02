@@ -16,6 +16,7 @@ Have a docker environment file `.env`. Windows example:
 `--force-recreate` forces the docker image to rebuild
 
 API available under `http://localhost:5000/` 
+Frontend available under `http://localhost:3000`
 
 # Using the service
 
