@@ -31,6 +31,7 @@ def onCall(ch, method, properties, body):
         print('is video request with videoName: ', videoName)
         url = downloadUrl.format(name = videoName)
         print('url for file download is: ', url)
+        tempVideoPath = tempdir + videoName + '/VID2.mp4'
         videoPath = tempdir + videoName + '/VID.mp4'
         print('videoPath: ', videoPath)
         response = requests.get(url)
@@ -48,12 +49,15 @@ def onCall(ch, method, properties, body):
         height, width, _ = frame.shape
         print('height:', height, ', width:', width)
         fourcc = 0x00000021 # Codec needed for Web Viewing
-        video = cv2.VideoWriter(videoPath, fourcc, 1, (width,height))    
+        fourcc = cv2.VideoWriter_fourcc(*"mp4v") # Codec needed for Web Viewing
+        video = cv2.VideoWriter(tempVideoPath, fourcc, 1, (width,height))    
         for image in images:
             video.write(cv2.imread(os.path.join(tempdir + videoName, image)))
         print('after writing images to video')
         cv2.destroyAllWindows()
-        video.release()
+        video.release()  
+        objects = [img for img in os.listdir(tempdir + videoName)]
+        os.system("ffmpeg -y -i {tempPath} -vcodec libx264 -acodec aac {path}".format(tempPath = tempVideoPath, path = videoPath))
         print('video released')
 
         objects = [img for img in os.listdir(tempdir + videoName)]
