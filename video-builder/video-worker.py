@@ -11,18 +11,24 @@ import requests
 
 import config
 
-fileRepoUrl = 'http://localhost:5000'
+# fileRepoUrl = 'http://localhost:5000'
+fileRepoUrl = 'http://htwai21swegrpb02:5000' # if running with docker compose
 downloadUrl = fileRepoUrl + '/file/{name}'
 uploadUrl = fileRepoUrl + '/file/{name}/{base64String}'
 tempdir = 'temp/'
 
 def onCall(ch, method, properties, body):
-    if body.split('|')[0].lower() == 'video request':
+    print('Video Builder got message: ', body)
+    body = body.decode('UTF-8') # TODO catch exception if it is a string rather than a byte-like object?
+    if body.split('|')[0].lower() == 'video request':        
         videoName = body.split('|')[1]
+        print('is video request with videoName: ', videoName)
         url = downloadUrl.format(name = videoName)
+        print('url for file download is: ', url)
         videoPath = tempdir + videoName + '/' + videoName + '.mp4'
-
+        print('videoPath: ', videoPath)
         response = requests.get(url)
+        print('response from url: ', response)
         if not os.path.isdir(tempdir):
             os.mkdir(tempdir)
         
@@ -31,25 +37,27 @@ def onCall(ch, method, properties, body):
         os.remove(tempdir + videoName + '.zip')
 
         images = [img for img in os.listdir(tempdir + videoName) if img.endswith(".jpg")]
+        print('images:', images)
         frame = cv2.imread(os.path.join(tempdir + videoName, images[0]))
         height, width, _ = frame.shape
-
+        print('height:', height, ', width:', width)
         fourcc = 0x00000021 # Codec needed for Web Viewing
         video = cv2.VideoWriter(videoPath, fourcc, 1, (width,height))    
         for image in images:
             video.write(cv2.imread(os.path.join(tempdir + videoName, image)))
-
+        print('after writing images to video')
         cv2.destroyAllWindows()
         video.release()
-
+        print('video released')
         with open(videoPath, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
             encoded_string = encoded_string.decode('ascii')
         shutil.rmtree(tempdir + videoName)
 
         url = uploadUrl.format(name = videoName, base64String = encoded_string)
+        print('url for upload is: ', url);
         response = requests.post(url)
-
+        print('response from upload: ', response)
         if not config.TEST_MODE:
             channelProducer.basic_publish(exchange='',
                             routing_key='hello',

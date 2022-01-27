@@ -13,7 +13,6 @@ from flask import Flask, Response, request
 from flask.helpers import send_file, send_from_directory
 from threading import Thread
 
-
 import config
 
 app = Flask(__name__)
@@ -99,21 +98,25 @@ def upload(name):
 
 @app.route("/file/<name>", methods=['GET'])
 def download(name):
+    print('api: download images')
     path = DIRECTORY_LOCATION + name + '/'
-
+    print('download:', path)
     if os.path.isdir(path):
+        print('download: is directory')
         tempdir = DIRECTORY_LOCATION + 'temp/'
         if not os.path.isdir(tempdir):
             os.mkdir(tempdir)
-
+        
         return_data = io.BytesIO()
         shutil.make_archive(tempdir + 'tmp', 'zip', path)
+        print('download: made archive')
         with open(tempdir + 'tmp.zip', 'rb') as fo:
             return_data.write(fo.read())
+
         os.remove(tempdir + 'tmp.zip')
-
+        print('download: removed tmp.zip')
         return_data.seek(0)
-
+        print('download: after seek(0)')
         return send_file(return_data, mimetype='application/zip')
     else:
         return send_from_directory(DIRECTORY_LOCATION, name)
@@ -125,6 +128,31 @@ def downloadVideo(name):
     resp = Response(open(path, 'rb'), direct_passthrough=True, mimetype='video/mp4', content_type='video/mp4')
     resp.headers['Content-Disposition'] = 'inline'
     return resp
+
+allowedOriginList = ['http://localhost:3000']
+
+@app.after_request
+def add_cors_headers(response):
+    print('add_cors_headers')
+    print('request.referrer:', request.referrer)
+    if request.referrer == None:
+        # access from video-worker
+        return response
+    r = request.referrer[:-1]
+    # r = request.headers['Origin'] is alternative
+    print('add_cors_headers r: ', r)
+    if r in allowedOriginList:
+        print('add_cors_headers r in allowed origin list')
+        response.headers.add('Access-Control-Allow-Origin', r)
+        response.headers.add('Access-Control-Allow-Credentials', 'true')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+        response.headers.add('Access-Control-Allow-Headers', 'Cache-Control')
+        response.headers.add('Access-Control-Allow-Headers', 'X-Requested-With')
+        response.headers.add('Access-Control-Allow-Headers', 'Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE')
+    else:
+        print('add_cors_headders r NOT in allowed origin list')
+    return response
 
 if not config.TEST_MODE:
     rabbitMqUrl ='amqp://ai21-ws21-swe-rabbitmq?connection_attempts=5&retry_delay=4'
