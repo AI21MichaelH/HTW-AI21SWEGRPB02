@@ -48,12 +48,15 @@ def read_file_chunks(path, byte1=None, byte2=None):
         chunk = f.read(length)
     return chunk, start, length, file_size
 
+
+
 @app.route("/file/<name>", methods=['POST'])
 def upload(name):
     base64string = request.get_data().decode("utf-8") 
-    if len(base64string) == 0:
-        base64string = request.form
 
+    return upload(name, base64string)
+
+def upload(name, base64string):
     if not os.path.isdir(DIRECTORY_LOCATION):
         os.mkdir(DIRECTORY_LOCATION)
 
