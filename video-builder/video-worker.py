@@ -11,21 +11,27 @@ import requests
 
 import config
 
-# fileRepoUrl = 'http://localhost:5000'
+#fileRepoUrl = 'http://localhost:5000'
 fileRepoUrl = 'http://htwai21swegrpb02:5000' # if running with docker compose
 downloadUrl = fileRepoUrl + '/file/{name}'
-uploadUrl = fileRepoUrl + '/file/{name}/{base64String}'
-tempdir = 'temp/'
+uploadUrl = fileRepoUrl + '/file/{name}'
+tempdir = '/temp/'
 
 def onCall(ch, method, properties, body):
     print('Video Builder got message: ', body)
-    body = body.decode('UTF-8') # TODO catch exception if it is a string rather than a byte-like object?
+    try:
+        decode = body.decode('UTF-8')
+        body = decode
+    except:
+        body = body
+
+
     if body.split('|')[0].lower() == 'video request':        
         videoName = body.split('|')[1]
         print('is video request with videoName: ', videoName)
         url = downloadUrl.format(name = videoName)
         print('url for file download is: ', url)
-        videoPath = tempdir + videoName + '/' + videoName + '.mp4'
+        videoPath = tempdir + videoName + '/VID.mp4'
         print('videoPath: ', videoPath)
         response = requests.get(url)
         print('response from url: ', response)
@@ -49,14 +55,18 @@ def onCall(ch, method, properties, body):
         cv2.destroyAllWindows()
         video.release()
         print('video released')
+
+        objects = [img for img in os.listdir(tempdir + videoName)]
+        print('files:', objects)
+
         with open(videoPath, "rb") as image_file:
             encoded_string = base64.b64encode(image_file.read())
             encoded_string = encoded_string.decode('ascii')
         shutil.rmtree(tempdir + videoName)
 
-        url = uploadUrl.format(name = videoName, base64String = encoded_string)
+        url = uploadUrl.format(name = videoName)
         print('url for upload is: ', url);
-        response = requests.post(url)
+        response = requests.post(url, data=encoded_string)
         print('response from upload: ', response)
         if not config.TEST_MODE:
             channelProducer.basic_publish(exchange='',
